@@ -1,5 +1,4 @@
 "use client"
- 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -8,11 +7,12 @@ import {
   Form,
 } from "@/components/ui/form"
 import { CustomFormField }  from "@/components/CustomFormField"
-import { SubmitButton } from "../SubmitButton"
+import SubmitButton from "../SubmitButton"
 import { useState } from "react"
 import { UserFormValidation } from "@/lib/validation"
 import { create } from "domain"
 import { useRouter } from "next/navigation"
+import { createUser } from "@/lib/actions/patient.actions"
 
 export enum FormFieldType {
     INPUT = 'input',
@@ -22,6 +22,9 @@ export enum FormFieldType {
     SELECT = 'select',
     DATE_PICKER = 'datePicker',
     SKELETON = 'skeleton',
+    DROPDOWN = "DROPDOWN",
+    SELECTGENDER = "SELECTGENDER",
+    FILE_UPLOAD = "FILE_UPLOAD",
 }
  
 
@@ -43,15 +46,24 @@ const PatientForm = () => {
  
   async function onSubmit({ name, email, phone}: z.infer<typeof UserFormValidation>) {
     setIsLoading(true);
-
+  
     try {
-        const userData = { name, email, phone }
-
-        const user = await createUser(userData);
-
-        if (user) router.push(`/patients/${user.$id}/register`)
+      console.log("Submitting form with data:", { name, email, phone });
+      const userData = { name, email, phone };
+  
+      const user = await createUser(userData);
+      console.log("User created:", user);
+  
+      if (user) {
+        console.log("Redirecting to:", `/patients/${user.$id}/register`);
+        router.push(`/patients/${user.$id}/register`);
+      } else {
+        console.error("User creation failed: No user returned");
+      }
     } catch (error) {
-        console.log(error);
+      console.error("Error creating user:", error);
+    } finally {
+      setIsLoading(false);
     }
   }
   return (
@@ -84,7 +96,7 @@ const PatientForm = () => {
         <CustomFormField 
             fieldType = {FormFieldType.PHONE_INPUT}
             form={form} 
-            name = "phone number"
+            name = "phone"
             label = "Phone Number"
             placeholder = "(386) 219 9000"
             iconSrc = "/assets/icons/email.svg"
