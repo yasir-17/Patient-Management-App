@@ -12,7 +12,7 @@ import { CustomFormField } from "@/components/CustomFormField"
 import SubmitButton from "../SubmitButton"
 import { useState } from "react"
 import { PatientFormValidation, UserFormValidation } from "@/lib/validation"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { createUser, registerPatient } from "@/lib/actions/patient.actions"
 import { FormFieldType } from "./PatientForm"
 import { Doctors, GenderOptions, IdentificationTypes, PatientFormDefaultValues } from "@/constants"
@@ -20,14 +20,19 @@ import Image from "next/image"
  
 
  
-const RegisterForm = ({ user }: {user: User}) => {
-
+const RegisterForm = ({ user }: { user: User }) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof PatientFormValidation>>({
-    resolver: zodResolver(PatientFormValidation),
-    defaultValues: PatientFormDefaultValues,
+      resolver: zodResolver(PatientFormValidation),
+      defaultValues: {
+          ...PatientFormDefaultValues,
+          name: searchParams.get('name') || '',
+          email: searchParams.get('email') || '',
+          phone: searchParams.get('phone') || '',
+      },
   });
 
   const onSubmit = async (values: z.infer<typeof PatientFormValidation>) => {

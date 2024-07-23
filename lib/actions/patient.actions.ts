@@ -6,6 +6,20 @@ import { parseStringify } from "../utils"
 import { use } from "react";
 import { InputFile } from 'node-appwrite/file'
 
+export const checkUserExists = async (email: string, phone: string) => {
+  try {
+    const usersList = await users.list([
+      Query.equal('email', [email]),
+      Query.equal('phone', [phone]),
+    ]);
+
+    return usersList.users.length > 0 ? usersList.users[0] : null;
+  } catch (error) {
+    console.error("Error checking if user exists:", error);
+    throw error;
+  }
+};
+
 export const createUser = async (user: CreateUserParams) => {
     try {
       console.log("Creating user with data:", user);

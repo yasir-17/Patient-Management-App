@@ -201,4 +201,4 @@ const CustomFormField: React.FC<CustomFormFieldProps> = (props: CustomFormFieldP
     )
 }
 
-export { CustomFormField };
+export { CustomFormField, FormFieldType }
